@@ -1,0 +1,1111 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = "postgresql://postgres:password@localhost:5432/bolero_music_api_development"
+}
+
+model active_admin_comments {
+  id            BigInt   @id @default(autoincrement())
+  namespace     String?  @db.VarChar
+  body          String?
+  resource_type String?  @db.VarChar
+  resource_id   BigInt?
+  author_type   String?  @db.VarChar
+  author_id     BigInt?
+  created_at    DateTime @db.Timestamp(6)
+  updated_at    DateTime @db.Timestamp(6)
+
+  @@index([author_type, author_id], map: "index_active_admin_comments_on_author")
+  @@index([namespace], map: "index_active_admin_comments_on_namespace")
+  @@index([resource_type, resource_id], map: "index_active_admin_comments_on_resource")
+}
+
+model active_storage_attachments {
+  id                   BigInt               @id @default(autoincrement())
+  name                 String               @db.VarChar
+  record_type          String               @db.VarChar
+  record_id            BigInt
+  blob_id              BigInt
+  created_at           DateTime             @db.Timestamp(6)
+  active_storage_blobs active_storage_blobs @relation(fields: [blob_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_rails_c3b3935057")
+
+  @@unique([record_type, record_id, name, blob_id], map: "index_active_storage_attachments_uniqueness")
+  @@index([blob_id], map: "index_active_storage_attachments_on_blob_id")
+}
+
+model active_storage_blobs {
+  id                             BigInt                           @id @default(autoincrement())
+  key                            String                           @unique(map: "index_active_storage_blobs_on_key") @db.VarChar
+  filename                       String                           @db.VarChar
+  content_type                   String?                          @db.VarChar
+  metadata                       String?
+  byte_size                      BigInt
+  checksum                       String                           @db.VarChar
+  created_at                     DateTime                         @db.Timestamp(6)
+  service_name                   String                           @db.VarChar
+  active_storage_attachments     active_storage_attachments[]
+  active_storage_variant_records active_storage_variant_records[]
+}
+
+model active_storage_variant_records {
+  id                   BigInt               @id @default(autoincrement())
+  blob_id              BigInt
+  variation_digest     String               @db.VarChar
+  active_storage_blobs active_storage_blobs @relation(fields: [blob_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_rails_993965df05")
+
+  @@unique([blob_id, variation_digest], map: "index_active_storage_variant_records_uniqueness")
+}
+
+model admin_users {
+  id                     BigInt    @id @default(autoincrement())
+  email                  String    @unique(map: "index_admin_users_on_email") @default("") @db.VarChar
+  encrypted_password     String    @default("") @db.VarChar
+  reset_password_token   String?   @unique(map: "index_admin_users_on_reset_password_token") @db.VarChar
+  reset_password_sent_at DateTime? @db.Timestamp(6)
+  remember_created_at    DateTime? @db.Timestamp(6)
+  created_at             DateTime  @db.Timestamp(6)
+  updated_at             DateTime  @db.Timestamp(6)
+}
+
+model administrators {
+  id         BigInt   @id @default(autoincrement())
+  user_id    BigInt?
+  squad_id   BigInt
+  created_at DateTime @db.Timestamp(6)
+  updated_at DateTime @db.Timestamp(6)
+  squads     squads   @relation(fields: [squad_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_rails_2b86664fcc")
+
+  @@index([squad_id], map: "index_administrators_on_squad_id")
+  @@index([user_id], map: "index_administrators_on_user_id")
+}
+
+model ar_internal_metadata {
+  key        String   @id @db.VarChar
+  value      String?  @db.VarChar
+  created_at DateTime @db.Timestamp(6)
+  updated_at DateTime @db.Timestamp(6)
+}
+
+model artist_metrics {
+  id                                       BigInt   @id @default(autoincrement())
+  artist_id                                BigInt
+  streaming_overall                        Float?
+  spotify_monthly_listeners                Float?
+  playlisted_amount                        BigInt?
+  fan_retention_overall                    Float?
+  social_overall                           Float?
+  instagram_followers                      BigInt?
+  twitter_followers                        BigInt?
+  youtube_followers                        BigInt?
+  tiktok_followers                         BigInt?
+  deezer_followers                         BigInt?
+  soundcloud_followers                     BigInt?
+  marketsales_overall                      Float?
+  radio_listing_monthly                    Float?
+  events_overall                           Float?
+  created_at                               DateTime @db.Timestamp(6)
+  updated_at                               DateTime @db.Timestamp(6)
+  spotify_followers                        BigInt?
+  spotify_top_10_tracks                    BigInt?
+  spotify_top_10_tracks_popularity_average Float?
+  concerts                                 BigInt?
+  festivals                                BigInt?
+  beatmaker_song_streaming_amount          BigInt?
+  beatmaker_songs_count                    Int?
+  beatmaker_songs_popularity_average       Float?
+  minted_nfts_count                        BigInt?
+  nfts_average_price                       Float?
+  web3_overall                             Float?
+  nft_trades_count                         BigInt?
+  audius_followers                         Int?     @default(0)
+  repost_count                             Int?     @default(0)
+  favorite_count                           Int?     @default(0)
+  artists                                  artists  @relation(fields: [artist_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_rails_ba6dab721f")
+
+  @@index([artist_id], map: "index_artist_metrics_on_artist_id")
+}
+
+model artist_scores {
+  id         BigInt   @id @default(autoincrement())
+  artist_id  BigInt?
+  score      String[] @default([])
+  created_at DateTime @db.Timestamp(6)
+  updated_at DateTime @db.Timestamp(6)
+}
+
+model artist_tokens {
+  id                            BigInt   @id @default(autoincrement())
+  artist_id                     BigInt
+  name                          String?  @db.VarChar
+  is_frozen                     Boolean  @default(true)
+  total_supply                  Int?
+  price                         String?  @db.VarChar
+  price_evolution               Float?
+  valorisation                  Int?
+  contract_address_v1           String?  @db.VarChar
+  token_contract_address_v1     String?  @db.VarChar
+  token_ico_contract_address_v1 String?  @db.VarChar
+  percent_for_bolero            Float?   @default(0.05)
+  percent_for_artist            Float?   @default(0.2)
+  percent_for_liquidity         Float?   @default(0.2)
+  shares                        Float    @default(0.8)
+  is_bolero_collecting          Boolean  @default(false)
+  stripe_country                String?  @db.VarChar
+  default_currency              String?  @db.VarChar
+  stripe_id                     String?  @db.VarChar
+  charges_enabled               Boolean  @default(false)
+  can_accept_card_payment       Boolean  @default(false)
+  finished_stripe_onboarding    Boolean  @default(false)
+  created_at                    DateTime @db.Timestamp(6)
+  updated_at                    DateTime @db.Timestamp(6)
+  hex_color                     String?  @db.VarChar
+  pending_price                 String?  @db.VarChar
+  pending_raw_price             String?  @db.VarChar
+  artists                       artists  @relation(fields: [artist_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_rails_fd4dc27978")
+
+  @@index([artist_id], map: "index_artist_tokens_on_artist_id")
+}
+
+model artists {
+  id                                BigInt                    @id @default(autoincrement())
+  name                              String                    @db.VarChar
+  genre                             String?                   @db.VarChar
+  soundcloud_profile                String?                   @db.VarChar
+  spotify_profile                   String?                   @db.VarChar
+  deezer_profile                    String?                   @db.VarChar
+  apple_profile                     String?                   @db.VarChar
+  youtube_profile                   String?                   @db.VarChar
+  instagram_profile                 String?                   @db.VarChar
+  tiktok_profile                    String?                   @db.VarChar
+  twitch_profile                    String?                   @db.VarChar
+  facebook_profile                  String?                   @db.VarChar
+  artist_bio                        String?
+  created_at                        DateTime                  @db.Timestamp(6)
+  updated_at                        DateTime                  @db.Timestamp(6)
+  user_id                           BigInt
+  card_name                         String?                   @db.VarChar
+  card_price_cents                  String                    @default("5000000000000000000") @db.VarChar
+  card_price_evolution              Float?
+  country                           String?                   @db.VarChar
+  twitter_profile                   String?                   @db.VarChar
+  validated                         Boolean                   @default(false)
+  uuid                              String?                   @db.VarChar
+  onboarding_completed_at           DateTime?                 @db.Timestamp(6)
+  slug                              String?                   @unique(map: "index_artists_on_slug") @db.VarChar
+  second_genre                      String?                   @db.VarChar
+  third_genre                       String?                   @db.VarChar
+  category                          String?                   @db.VarChar
+  validated_at                      DateTime?                 @db.Timestamp(6)
+  phone_number                      String?
+  songkick_profile                  String?                   @db.VarChar
+  active                            Boolean?                  @default(true)
+  total_cards_supply                Float?                    @default(1000.0)
+  valorisation                      Int?                      @default(50000)
+  management_mail                   String                    @db.VarChar
+  management_phone                  String?                   @db.VarChar
+  publisher                         String?                   @db.VarChar
+  label                             String?                   @db.VarChar
+  genius_url                        String?                   @db.VarChar
+  beatmaker                         Boolean?                  @default(false)
+  genius_id                         String?                   @db.VarChar
+  tokenized                         Boolean                   @default(false)
+  token_contract_address_deprecated String?                   @db.VarChar
+  audius_profile                    String?                   @db.VarChar
+  tokenized_at                      DateTime?                 @db.Timestamp(6)
+  selected_price                    Boolean?                  @default(false)
+  early                             Boolean?                  @default(false)
+  suspended                         Boolean?                  @default(false)
+  deprecated                        Boolean?                  @default(false)
+  token_primary                     Boolean?                  @default(true)
+  token_on_secondary_at             DateTime?                 @db.Timestamp(6)
+  token_for_bolero                  Float?                    @default(0.05)
+  token_for_artist                  Float?                    @default(0.2)
+  token_for_liquidity               Float?                    @default(0.2)
+  is_frozen                         Boolean                   @default(true)
+  shares                            Float                     @default(0.8)
+  home_top_section_rank             Int?
+  home_stay_ahead_section_rank      Int?
+  similar                           Boolean                   @default(false)
+  for_gift_connect                  Boolean                   @default(false)
+  audius_id                         String?                   @db.VarChar
+  artisttextsearchable_index_col    Unsupported("tsvector")?  @default(dbgenerated("to_tsvector('simple'::regconfig, (((((COALESCE(name, ''::character varying))::text || ' '::text) || (COALESCE(card_name, ''::character varying))::text) || ' '::text) || (COALESCE(slug, ''::character varying))::text))"))
+  music_genre_id                    BigInt?
+  hot_stuff_rank                    Int?
+  country_flag                      String?                   @db.VarChar
+  weekly_score_evolution_rank       Int?                      @default(1)
+  current_status                    String?                   @db.VarChar
+  reward_email                      String?                   @db.VarChar
+  is_bolero_collecting              Boolean                   @default(false)
+  onboarding_step                   Int?                      @default(0)
+  stripe_country                    String?                   @db.VarChar
+  assets_status                     String?                   @db.VarChar
+  visible                           Boolean?                  @default(false)
+  visible_at                        DateTime?                 @db.Timestamp(6)
+  nft_only                          Boolean?                  @default(false)
+  teasing_mode                      Boolean?                  @default(false)
+  ready_to_tease                    Boolean?                  @default(false)
+  teasing_description               String?
+  music_genres                      music_genres?             @relation(fields: [music_genre_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_rails_0b5a15b091")
+  users                             users                     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_rails_6bcbebdd23")
+  artist_metrics                    artist_metrics[]
+  artist_tokens                     artist_tokens[]
+  beatmaker_songs                   beatmaker_songs[]
+  blockchain_transactions           blockchain_transactions[]
+  collections                       collections[]
+  compilations                      compilations[]
+  contributors                      contributors[]
+  discounts                         discounts[]
+  multiple_groups                   multiple_groups[]
+  nfts                              nfts[]
+  offchain_transactions             offchain_transactions[]
+  stripe_splitters                  stripe_splitters[]
+  stripe_transactions               stripe_transactions[]
+  token_prices                      token_prices[]
+  update_bc_prices                  update_bc_prices[]
+  user_perks                        user_perks[]
+  user_reward_tasks                 user_reward_tasks[]
+  wallets                           wallets[]
+
+  @@index([artisttextsearchable_index_col], map: "artisttextsearch_idx", type: Gin)
+  @@index([artisttextsearchable_index_col], map: "artisttextsearchable_index", type: Gin)
+  @@index([music_genre_id], map: "index_artists_on_music_genre_id")
+  @@index([user_id], map: "index_artists_on_user_id")
+}
+
+model beatmaker_songs {
+  id                    BigInt   @id @default(autoincrement())
+  name                  String?  @db.VarChar
+  genius_id             String?  @db.VarChar
+  artist_id             BigInt
+  created_at            DateTime @db.Timestamp(6)
+  updated_at            DateTime @db.Timestamp(6)
+  youtube_id            String?  @db.VarChar
+  apple_music_id        String?  @db.VarChar
+  spotify_id            String?  @db.VarChar
+  spotify_total_streams Int?
+  soundchart_uuid       String?  @db.VarChar
+  popularity            Float?
+  artists               artists  @relation(fields: [artist_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_rails_320b3a4e5e")
+
+  @@index([artist_id], map: "index_beatmaker_songs_on_artist_id")
+}
+
+model bid_offers {
+  id                      BigInt   @id @default(autoincrement())
+  amount                  String   @db.VarChar
+  bidder_wallet_address   String   @db.VarChar
+  bid_id                  BigInt
+  user_id                 BigInt?
+  tx_hash                 String   @unique(map: "index_bid_offers_on_tx_hash") @db.VarChar
+  created_at              DateTime @db.Timestamp(6)
+  updated_at              DateTime @db.Timestamp(6)
+  bid_counter             BigInt
+  executed                Boolean  @default(false)
+  version                 Int?
+  bid_version_and_counter String   @db.VarChar
+  users                   users?   @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_rails_12be02cbe6")
+  bids                    bids     @relation(fields: [bid_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_rails_18f102c528")
+
+  @@index([bid_id], map: "index_bid_offers_on_bid_id")
+  @@index([user_id], map: "index_bid_offers_on_user_id")
+  @@index([bid_version_and_counter], map: "index_bid_ofs_on_bid_vers_and_ctr")
+}
+
+model bids {
+  id                          BigInt       @id @default(autoincrement())
+  want_address                String       @db.VarChar
+  want_token_symbol           String       @db.VarChar
+  price                       String       @db.VarChar
+  status                      String       @db.VarChar
+  start_time                  DateTime     @db.Timestamp(6)
+  end_time                    DateTime     @db.Timestamp(6)
+  bolero_nft_contract_address String       @db.VarChar
+  seller_address              String       @db.VarChar
+  primary_market              Boolean      @default(true)
+  nft_token_id                BigInt?
+  created_at                  DateTime     @db.Timestamp(6)
+  updated_at                  DateTime     @db.Timestamp(6)
+  tx_hash                     String       @db.VarChar
+  counter                     BigInt
+  start_price                 String       @db.VarChar
+  cancelled_at                DateTime?    @db.Timestamp(6)
+  version                     Int?
+  version_and_counter         String       @unique(map: "index_bids_on_contract_version_and_counter") @db.VarChar
+  nft_version_and_token_id    String       @db.VarChar
+  bid_offers                  bid_offers[]
+
+  @@index([nft_version_and_token_id], map: "index_bids_on_nft_version_and_token_id")
+}
+
+model blockchain_transactions {
+  id                       BigInt                 @id @default(autoincrement())
+  tx_hash                  String?                @db.VarChar
+  user_id                  BigInt?
+  artist_id                BigInt
+  created_at               DateTime               @db.Timestamp(6)
+  updated_at               DateTime               @db.Timestamp(6)
+  is_nft                   Boolean?               @default(false)
+  value                    String?                @db.VarChar
+  token_count              String?                @db.VarChar
+  currency                 String?                @default("USDC") @db.VarChar
+  primary_market           Boolean?               @default(true)
+  artist_earnings          String?                @db.VarChar
+  seller_address           String?                @db.VarChar
+  buyer_address            String?                @db.VarChar
+  nft_token_id             BigInt?
+  direct_buy               Boolean?               @default(false)
+  status                   String?                @db.VarChar
+  stripe_transaction_id    BigInt?                @unique(map: "index_blockchain_transactions_on_stripe_transaction_id")
+  nft_version              Int?
+  nft_version_and_token_id String?                @db.VarChar
+  country_code             String?                @db.VarChar
+  offchain_transaction_id  BigInt?
+  deprecated               Boolean                @default(false)
+  users                    users?                 @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_rails_5139afdef3")
+  offchain_transactions    offchain_transactions? @relation(fields: [offchain_transaction_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_rails_67d1023027")
+  artists                  artists                @relation(fields: [artist_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_rails_93c5b6c75a")
+
+  @@index([nft_version_and_token_id], map: "index_bc_txs_on_nft_version_and_token_id")
+  @@index([artist_id], map: "index_blockchain_transactions_on_artist_id")
+  @@index([offchain_transaction_id], map: "index_blockchain_transactions_on_offchain_transaction_id")
+  @@index([tx_hash], map: "index_blockchain_transactions_on_tx_hash")
+  @@index([user_id], map: "index_blockchain_transactions_on_user_id")
+}
+
+model collections {
+  id                     BigInt   @id @default(autoincrement())
+  name                   String   @db.VarChar
+  artist_royalties       Float?   @default(15.0)
+  total_supply           Int
+  private_sale           Boolean  @default(false)
+  private_sale_threshold String?  @db.VarChar
+  artist_id              BigInt
+  created_at             DateTime @db.Timestamp(6)
+  updated_at             DateTime @db.Timestamp(6)
+  wallet_address         String   @db.VarChar
+  token_id               BigInt
+  version                Int
+  version_and_token_id   String   @unique(map: "index_collections_on_version_and_token_id") @db.VarChar
+  artists                artists  @relation(fields: [artist_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_rails_469d01856d")
+  nfts                   nfts[]
+
+  @@index([artist_id], map: "index_collections_on_artist_id")
+}
+
+model compilations {
+  id              BigInt            @id @default(autoincrement())
+  name            String?           @db.VarChar
+  description     String?
+  artist_id       BigInt?
+  created_at      DateTime          @db.Timestamp(6)
+  updated_at      DateTime          @db.Timestamp(6)
+  published       Boolean           @default(false)
+  slug            String?           @unique(map: "index_compilations_on_slug") @db.VarChar
+  count           Int?              @default(0)
+  artists         artists?          @relation(fields: [artist_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_rails_7581e27176")
+  contributors    contributors[]
+  multiple_groups multiple_groups[]
+  nfts            nfts[]
+
+  @@index([artist_id], map: "index_compilations_on_artist_id")
+}
+
+model contributors {
+  id                  BigInt        @id @default(autoincrement())
+  email               String        @db.VarChar
+  accepted_invitation Boolean       @default(false)
+  compilation_id      BigInt?
+  artist_id           BigInt?
+  created_at          DateTime      @db.Timestamp(6)
+  updated_at          DateTime      @db.Timestamp(6)
+  compilations        compilations? @relation(fields: [compilation_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_rails_3c55c3240c")
+  artists             artists?      @relation(fields: [artist_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_rails_c751d6349e")
+
+  @@index([artist_id], map: "index_contributors_on_artist_id")
+  @@index([compilation_id], map: "index_contributors_on_compilation_id")
+}
+
+model currencies {
+  id         BigInt   @id @default(autoincrement())
+  balance    String   @db.VarChar
+  user_id    BigInt
+  symbol     String?  @db.VarChar
+  created_at DateTime @db.Timestamp(6)
+  updated_at DateTime @db.Timestamp(6)
+  users      users    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_rails_c831635a42")
+
+  @@unique([symbol, user_id], map: "uniq_symbol_per_user")
+  @@index([user_id], map: "index_currencies_on_user_id")
+}
+
+model discounts {
+  id                    BigInt                  @id @default(autoincrement())
+  name                  String?                 @db.VarChar
+  user_id               BigInt
+  active                Boolean?
+  created_at            DateTime                @db.Timestamp(6)
+  updated_at            DateTime                @db.Timestamp(6)
+  used_at               DateTime?               @db.Timestamp(6)
+  artist_id             BigInt?
+  artists               artists?                @relation(fields: [artist_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_rails_35f35c9fee")
+  users                 users                   @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_rails_9a0dc6cff5")
+  offchain_transactions offchain_transactions[]
+
+  @@index([artist_id], map: "index_discounts_on_artist_id")
+  @@index([user_id], map: "index_discounts_on_user_id")
+}
+
+model early_access_list_users {
+  id          BigInt   @id @default(autoincrement())
+  email       String   @db.VarChar
+  user_id     BigInt?
+  created_at  DateTime @db.Timestamp(6)
+  updated_at  DateTime @db.Timestamp(6)
+  artist_id   BigInt?
+  artist_name String?  @db.VarChar
+  users       users?   @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_rails_0e069eb060")
+
+  @@index([artist_id], map: "index_early_access_list_users_on_early_access_list_id")
+  @@index([user_id], map: "index_early_access_list_users_on_user_id")
+}
+
+model external_nfts {
+  id                BigInt   @id @default(autoincrement())
+  creator_address   String   @db.VarChar
+  block_num         String   @db.VarChar
+  category          String   @db.VarChar
+  token_id          String?  @db.VarChar
+  erc_155_token_ids String[] @default([]) @db.VarChar
+  contract_address  String   @db.VarChar
+  last_value        String?  @db.VarChar
+  wallet_id         BigInt?
+  created_at        DateTime @db.Timestamp(6)
+  updated_at        DateTime @db.Timestamp(6)
+  wallets           wallets? @relation(fields: [wallet_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_rails_f95196804a")
+  trades            trades[]
+
+  @@index([wallet_id], map: "index_external_nfts_on_wallet_id")
+}
+
+model follows {
+  id           BigInt   @id @default(autoincrement())
+  user_id      BigInt?
+  following_id BigInt?
+  created_at   DateTime @db.Timestamp(6)
+  updated_at   DateTime @db.Timestamp(6)
+}
+
+model friendly_id_slugs {
+  id             BigInt    @id @default(autoincrement())
+  slug           String    @db.VarChar
+  sluggable_id   Int
+  sluggable_type String?   @db.VarChar(50)
+  scope          String?   @db.VarChar
+  created_at     DateTime? @db.Timestamp(6)
+
+  @@unique([slug, sluggable_type, scope], map: "index_friendly_id_slugs_on_slug_and_sluggable_type_and_scope")
+  @@index([slug, sluggable_type], map: "index_friendly_id_slugs_on_slug_and_sluggable_type")
+  @@index([sluggable_type, sluggable_id], map: "index_friendly_id_slugs_on_sluggable_type_and_sluggable_id")
+}
+
+model members {
+  id         BigInt   @id @default(autoincrement())
+  user_id    BigInt?
+  squad_id   BigInt
+  created_at DateTime @db.Timestamp(6)
+  updated_at DateTime @db.Timestamp(6)
+  squads     squads   @relation(fields: [squad_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_rails_fe63915777")
+
+  @@index([squad_id], map: "index_members_on_squad_id")
+  @@index([user_id], map: "index_members_on_user_id")
+}
+
+model multiple_groups {
+  id             BigInt        @id @default(autoincrement())
+  created_at     DateTime      @db.Timestamp(6)
+  updated_at     DateTime      @db.Timestamp(6)
+  artist_id      BigInt?
+  compilation_id BigInt?
+  name           String?       @db.VarChar
+  compilations   compilations? @relation(fields: [compilation_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_rails_a1b7d4fcfc")
+  artists        artists?      @relation(fields: [artist_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_rails_f926097151")
+  nfts           nfts[]
+
+  @@index([artist_id], map: "index_multiple_groups_on_artist_id")
+  @@index([compilation_id], map: "index_multiple_groups_on_compilation_id")
+}
+
+model music_genres {
+  id          BigInt    @id @default(autoincrement())
+  value       String?   @db.VarChar
+  picture_key String?   @db.VarChar
+  rank        Int       @default(0)
+  created_at  DateTime  @db.Timestamp(6)
+  updated_at  DateTime  @db.Timestamp(6)
+  artists     artists[]
+}
+
+model nfts {
+  id                              BigInt           @id @default(autoincrement())
+  title                           String?          @db.VarChar
+  description                     String?
+  private                         Boolean?         @default(false)
+  category                        String?          @db.VarChar
+  edition_of                      String?          @db.VarChar
+  image_url                       String?          @db.VarChar
+  media_format                    String?          @db.VarChar
+  token_id                        BigInt
+  artist_id                       BigInt
+  user_id                         BigInt?
+  created_at                      DateTime         @db.Timestamp(6)
+  updated_at                      DateTime         @db.Timestamp(6)
+  audio_url                       String?          @db.VarChar
+  multiple_group_id               BigInt?
+  bolero_royalty                  Float            @default(2.5)
+  token_uri                       String?          @db.VarChar
+  price                           String?          @db.VarChar
+  collection_id                   BigInt?
+  visual_type                     String?          @db.VarChar
+  home_featured                   Boolean?         @default(false)
+  compilation_id                  BigInt?
+  collection_token_id             BigInt?
+  collection_version_and_token_id String?          @db.VarChar
+  agreement_url                   String?          @db.VarChar
+  version                         Int?
+  version_and_token_id            String           @unique(map: "index_nfts_on_version_and_token_id") @db.VarChar
+  slug                            String?          @unique(map: "index_nfts_on_slug") @db.VarChar
+  multiple_name                   String?          @db.VarChar
+  artists                         artists          @relation(fields: [artist_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_rails_6b3b0a74cc")
+  compilations                    compilations?    @relation(fields: [compilation_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_rails_8a2d3a58dc")
+  multiple_groups                 multiple_groups? @relation(fields: [multiple_group_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_rails_8c75924485")
+  users                           users?           @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_rails_c7253b9bb8")
+  collections                     collections?     @relation(fields: [collection_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_rails_cf93ccf032")
+
+  @@index([artist_id], map: "index_nfts_on_artist_id")
+  @@index([collection_id], map: "index_nfts_on_collection_id")
+  @@index([collection_version_and_token_id], map: "index_nfts_on_collection_version_and_token_id")
+  @@index([compilation_id], map: "index_nfts_on_compilation_id")
+  @@index([multiple_group_id], map: "index_nfts_on_multiple_group_id")
+  @@index([user_id], map: "index_nfts_on_user_id")
+}
+
+model notifications {
+  id              BigInt    @id @default(autoincrement())
+  recipient_id    BigInt?
+  actor_id        BigInt?
+  read_at         DateTime? @db.Timestamp(6)
+  action          String?   @db.VarChar
+  notifiable_id   BigInt?
+  notifiable_type String?   @db.VarChar
+  created_at      DateTime  @db.Timestamp(6)
+  updated_at      DateTime  @db.Timestamp(6)
+  actor_type      String?   @db.VarChar
+  path            String?   @db.VarChar
+  message         Json?     @default("{}") @db.Json
+  v_one           Boolean?  @default(false)
+}
+
+model offchain_transactions {
+  id                      BigInt                    @id @default(autoincrement())
+  token_count             String                    @db.VarChar
+  value_in_usdc           Float                     @default(1.0)
+  token_symbol            String                    @db.VarChar
+  transformed_to_bc_tx    Boolean                   @default(false)
+  in_vault                Boolean                   @default(false)
+  artist_id               BigInt
+  user_id                 BigInt?
+  created_at              DateTime                  @db.Timestamp(6)
+  updated_at              DateTime                  @db.Timestamp(6)
+  country_code            String?                   @db.VarChar
+  discount_id             BigInt?
+  user_reward_task_id     BigInt?
+  tx_hash                 String?                   @db.VarChar
+  sent_at                 DateTime?                 @db.Timestamp(6)
+  user_destroyed          Boolean                   @default(false)
+  artists                 artists                   @relation(fields: [artist_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_rails_2ce3066e30")
+  discounts               discounts?                @relation(fields: [discount_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_rails_3a7b40be48")
+  users                   users?                    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_rails_adb769f9c6")
+  user_reward_tasks       user_reward_tasks?        @relation(fields: [user_reward_task_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_rails_c3425bcc64")
+  blockchain_transactions blockchain_transactions[]
+
+  @@index([artist_id], map: "index_offchain_transactions_on_artist_id")
+  @@index([discount_id], map: "index_offchain_transactions_on_discount_id")
+  @@index([user_id], map: "index_offchain_transactions_on_user_id")
+  @@index([user_reward_task_id], map: "index_offchain_transactions_on_user_reward_task_id")
+}
+
+model package_update_bc_prices {
+  id               BigInt             @id @default(autoincrement())
+  created_at       DateTime           @db.Timestamp(6)
+  updated_at       DateTime           @db.Timestamp(6)
+  update_bc_prices update_bc_prices[]
+}
+
+model perks {
+  id           BigInt       @id @default(autoincrement())
+  name         String?      @db.VarChar
+  description  String?
+  created_at   DateTime     @db.Timestamp(6)
+  updated_at   DateTime     @db.Timestamp(6)
+  stage_id     BigInt
+  hidden_link  String?      @db.VarChar
+  remaining    Int?
+  total_supply Int?
+  stages       stages       @relation(fields: [stage_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_rails_dcc856d924")
+  user_perks   user_perks[]
+
+  @@index([stage_id], map: "index_perks_on_stage_id")
+}
+
+model quick_searches {
+  id           BigInt   @id @default(autoincrement())
+  filter_value String   @db.VarChar
+  filter_type  String   @db.VarChar
+  count        BigInt
+  created_at   DateTime @db.Timestamp(6)
+  updated_at   DateTime @db.Timestamp(6)
+
+  @@unique([filter_value, filter_type], map: "unique_index_quick_search")
+}
+
+model requested_artists {
+  id          BigInt   @id @default(autoincrement())
+  name        String?  @db.VarChar
+  spotify_url String?  @db.VarChar
+  user_id     BigInt?
+  created_at  DateTime @db.Timestamp(6)
+  updated_at  DateTime @db.Timestamp(6)
+  votes_count BigInt?  @default(0)
+  spotify_id  String?  @db.VarChar
+
+  @@index([user_id], map: "index_requested_artists_on_user_id")
+}
+
+model reward_tasks {
+  id                BigInt              @id @default(autoincrement())
+  fr_title          String              @db.VarChar
+  en_title          String              @db.VarChar
+  fr_description    String              @db.VarChar
+  en_description    String              @db.VarChar
+  category          String              @db.VarChar
+  link              String?             @db.VarChar
+  rank              Int?
+  created_at        DateTime            @db.Timestamp(6)
+  updated_at        DateTime            @db.Timestamp(6)
+  value_in_usdc     Float               @default(1.0)
+  user_reward_tasks user_reward_tasks[]
+}
+
+model schema_migrations {
+  version String @id @db.VarChar
+}
+
+model sell_offers {
+  id                       BigInt   @id @default(autoincrement())
+  sell_counter             BigInt
+  seller_wallet_address    String   @db.VarChar
+  want_address             String   @db.VarChar
+  want_token_symbol        String   @db.VarChar
+  price                    String   @db.VarChar
+  status                   String   @db.VarChar
+  tx_hash                  String   @db.VarChar
+  primary_market           String?  @default("true") @db.VarChar
+  nft_token_id             BigInt
+  created_at               DateTime @db.Timestamp(6)
+  updated_at               DateTime @db.Timestamp(6)
+  version                  Int
+  version_and_counter      String   @unique(map: "index_sell_offers_on_version_and_counter") @db.VarChar
+  nft_version_and_token_id String   @db.VarChar
+
+  @@index([nft_version_and_token_id], map: "index_sell_offers_on_nft_version_and_token_id")
+}
+
+model splitter_beneficiaries {
+  id                     BigInt           @id @default(autoincrement())
+  email                  String           @db.VarChar
+  stripe_id              String?          @db.VarChar
+  payouts_enabled        Boolean          @default(false)
+  stripe_login_link      String?          @db.VarChar
+  stripe_onboarding_link String?          @db.VarChar
+  shares                 Float?
+  wallet_address         String?          @db.VarChar
+  stripe_splitter_id     BigInt
+  user_id                BigInt?
+  created_at             DateTime         @db.Timestamp(6)
+  updated_at             DateTime         @db.Timestamp(6)
+  default_currency       String?          @db.VarChar
+  in_splitter            Boolean?         @default(false)
+  language               String?          @default("en") @db.VarChar
+  country                String           @db.VarChar
+  users                  users?           @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_rails_3a702a8866")
+  stripe_splitters       stripe_splitters @relation(fields: [stripe_splitter_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_rails_ce3f81b6ab")
+
+  @@index([stripe_splitter_id], map: "index_splitter_beneficiaries_on_stripe_splitter_id")
+  @@index([user_id], map: "index_splitter_beneficiaries_on_user_id")
+}
+
+model squads {
+  id                       BigInt           @id @default(autoincrement())
+  name                     String?          @db.VarChar
+  short_description        String?          @db.VarChar
+  long_description         String?          @db.VarChar
+  tags                     String[]         @default([]) @db.VarChar
+  user_id                  BigInt
+  created_at               DateTime         @db.Timestamp(6)
+  updated_at               DateTime         @db.Timestamp(6)
+  members_usernames        String[]         @default([]) @db.VarChar
+  administrators_usernames String[]         @default([]) @db.VarChar
+  contract_address         String?          @db.VarChar
+  spoken_language          String?          @db.VarChar
+  users                    users            @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_rails_13359b6672")
+  administrators           administrators[]
+  members                  members[]
+
+  @@index([user_id], map: "index_squads_on_user_id")
+}
+
+model stage_members {
+  id         BigInt       @id @default(autoincrement())
+  user_id    BigInt?
+  stage_id   BigInt
+  created_at DateTime     @db.Timestamp(6)
+  updated_at DateTime     @db.Timestamp(6)
+  old        Boolean?     @default(false)
+  stages     stages       @relation(fields: [stage_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_rails_5a6b228441")
+  users      users?       @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_rails_aff22d9c29")
+  user_perks user_perks[]
+
+  @@index([stage_id], map: "index_stage_members_on_stage_id")
+  @@index([user_id], map: "index_stage_members_on_user_id")
+}
+
+model stages {
+  id               BigInt          @id @default(autoincrement())
+  created_at       DateTime        @db.Timestamp(6)
+  updated_at       DateTime        @db.Timestamp(6)
+  number_of_tokens Float
+  artist_id        BigInt?
+  customed_message String?         @db.VarChar
+  activated_at     DateTime?       @db.Timestamp(6)
+  disabled         Boolean?        @default(false)
+  perks            perks[]
+  stage_members    stage_members[]
+
+  @@index([artist_id], map: "index_stages_on_artist_id")
+}
+
+model stripe_splitters {
+  id                     BigInt                   @id @default(autoincrement())
+  active                 Boolean                  @default(false)
+  artist_id              BigInt
+  created_at             DateTime                 @db.Timestamp(6)
+  updated_at             DateTime                 @db.Timestamp(6)
+  artist_shares          Float                    @default(100.0)
+  artists                artists                  @relation(fields: [artist_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_rails_3164de0155")
+  splitter_beneficiaries splitter_beneficiaries[]
+
+  @@index([artist_id], map: "index_stripe_splitters_on_artist_id")
+}
+
+model stripe_transactions {
+  id                                BigInt   @id @default(autoincrement())
+  user_id                           BigInt?
+  artist_id                         BigInt?
+  total_price_cents                 Int
+  price_without_fees_cents          Int
+  token_count                       String   @db.VarChar
+  artist_earnings_cents             Int
+  stripe_status                     String?  @db.VarChar
+  payment_intent_secret             String?  @db.VarChar
+  transformed_to_blockchain_tx      Boolean? @default(false)
+  created_at                        DateTime @db.Timestamp(6)
+  updated_at                        DateTime @db.Timestamp(6)
+  status                            String?  @db.VarChar
+  in_vault                          Boolean? @default(false)
+  country_code                      String?  @db.VarChar
+  with_email                        Boolean? @default(true)
+  total_price_cents_in_euros        Int?
+  price_without_fees_cents_in_euros Int?
+  deprecated                        Boolean  @default(false)
+  artists                           artists? @relation(fields: [artist_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_rails_7bf178d15d")
+  users                             users?   @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_rails_cb6036cfe9")
+
+  @@index([artist_id], map: "index_stripe_transactions_on_artist_id")
+  @@index([user_id], map: "index_stripe_transactions_on_user_id")
+}
+
+model token_prices {
+  id            BigInt   @id @default(autoincrement())
+  raw_price     String   @db.VarChar
+  rounded_price Float
+  artist_id     BigInt
+  created_at    DateTime @db.Timestamp(6)
+  updated_at    DateTime @db.Timestamp(6)
+  artists       artists  @relation(fields: [artist_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_rails_81f67573ce")
+
+  @@index([artist_id], map: "index_token_prices_on_artist_id")
+}
+
+model trades {
+  id                BigInt         @id @default(autoincrement())
+  block_timestamp   DateTime       @db.Timestamp(6)
+  nft_token_id      String         @db.VarChar
+  external_nft_id   BigInt?
+  tx_hash           String         @db.VarChar
+  block_num         String         @db.VarChar
+  price             String         @db.VarChar
+  currency          String         @default("ETH") @db.VarChar
+  currency_decimals String         @default("18") @db.VarChar
+  currency_value    String?        @db.VarChar
+  price_in_usd      String?        @db.VarChar
+  created_at        DateTime       @db.Timestamp(6)
+  updated_at        DateTime       @db.Timestamp(6)
+  external_nfts     external_nfts? @relation(fields: [external_nft_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_rails_d20928d1bf")
+
+  @@index([external_nft_id], map: "index_trades_on_external_nft_id")
+}
+
+model transactions {
+  id                       BigInt   @id @default(autoincrement())
+  status                   String?  @db.VarChar
+  total_price              Float?
+  cards_count              Float?
+  user_id                  BigInt?
+  created_at               DateTime @db.Timestamp(6)
+  updated_at               DateTime @db.Timestamp(6)
+  amount_currency          String   @default("EUR") @db.VarChar
+  checkout_session_id      String?  @db.VarChar
+  total_price_without_fees Int?     @default(500)
+  mail_delivered           Boolean?
+  artist_id                BigInt
+  users                    users?   @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_rails_77364e6416")
+
+  @@index([artist_id], map: "index_transactions_on_artist_id")
+  @@index([user_id], map: "index_transactions_on_user_id")
+}
+
+model transfer_groups {
+  id                BigInt    @id @default(autoincrement())
+  uuid              String?   @db.VarChar
+  transferred       Boolean?
+  transferred_at    DateTime? @db.Timestamp(6)
+  created_at        DateTime  @db.Timestamp(6)
+  updated_at        DateTime  @db.Timestamp(6)
+  payment_intent_id String?   @db.VarChar
+}
+
+model update_bc_prices {
+  id                         BigInt                   @id @default(autoincrement())
+  tx                         String                   @db.VarChar
+  status                     String                   @default("in_progress") @db.VarChar
+  failure_last_retry         DateTime?                @db.Timestamp(6)
+  artist_id                  BigInt
+  created_at                 DateTime                 @db.Timestamp(6)
+  updated_at                 DateTime                 @db.Timestamp(6)
+  package_update_bc_price_id BigInt
+  failures_count             Int?
+  gas_price                  String?                  @db.VarChar
+  artists                    artists                  @relation(fields: [artist_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_rails_012307442f")
+  package_update_bc_prices   package_update_bc_prices @relation(fields: [package_update_bc_price_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_rails_0af8fbd199")
+
+  @@index([artist_id], map: "index_update_bc_prices_on_artist_id")
+  @@index([package_update_bc_price_id], map: "index_update_bc_prices_on_package_update_bc_price_id")
+}
+
+model user_perks {
+  id               BigInt        @id @default(autoincrement())
+  delivered        Boolean?      @default(false)
+  stage_member_id  BigInt
+  created_at       DateTime      @db.Timestamp(6)
+  updated_at       DateTime      @db.Timestamp(6)
+  name             String?       @db.VarChar
+  description      String?       @db.VarChar
+  artist_id        BigInt
+  user_id          BigInt?
+  link             String?       @db.VarChar
+  delivered_at     DateTime?     @db.Timestamp(6)
+  perk_id          BigInt?
+  user_email       String?       @db.VarChar
+  user_picture_key String?       @db.VarChar
+  perks            perks?        @relation(fields: [perk_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_rails_14e632ba21")
+  users            users?        @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_rails_3a08148acf")
+  artists          artists       @relation(fields: [artist_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_rails_a10f605de3")
+  stage_members    stage_members @relation(fields: [stage_member_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_rails_bd41073bf3")
+
+  @@index([artist_id], map: "index_user_perks_on_artist_id")
+  @@index([perk_id], map: "index_user_perks_on_perk_id")
+  @@index([stage_member_id], map: "index_user_perks_on_stage_member_id")
+  @@index([user_id], map: "index_user_perks_on_user_id")
+}
+
+model user_reward_tasks {
+  id                    BigInt                  @id @default(autoincrement())
+  completed             Boolean                 @default(false)
+  completed_at          DateTime?               @db.Timestamp(6)
+  user_id               BigInt
+  reward_task_id        BigInt
+  created_at            DateTime                @db.Timestamp(6)
+  updated_at            DateTime                @db.Timestamp(6)
+  claimed               Boolean                 @default(false)
+  distributed           Boolean                 @default(false)
+  value_in_usdc         Float                   @default(1.0)
+  artist_id             BigInt?
+  artists               artists?                @relation(fields: [artist_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_rails_26c4c96370")
+  users                 users                   @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_rails_a0ba8071c5")
+  reward_tasks          reward_tasks            @relation(fields: [reward_task_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_rails_a4d90930ee")
+  offchain_transactions offchain_transactions[]
+
+  @@index([artist_id], map: "index_user_reward_tasks_on_artist_id")
+  @@index([reward_task_id], map: "index_user_reward_tasks_on_reward_task_id")
+  @@index([user_id], map: "index_user_reward_tasks_on_user_id")
+}
+
+model users {
+  id                            BigInt                    @id @default(autoincrement())
+  email                         String                    @unique(map: "index_users_on_email") @default("") @db.VarChar
+  encrypted_password            String                    @default("") @db.VarChar
+  reset_password_token          String?                   @unique(map: "index_users_on_reset_password_token") @db.VarChar
+  reset_password_sent_at        DateTime?                 @db.Timestamp(6)
+  remember_created_at           DateTime?                 @db.Timestamp(6)
+  created_at                    DateTime                  @db.Timestamp(6)
+  updated_at                    DateTime                  @db.Timestamp(6)
+  first_name                    String?                   @db.VarChar
+  last_name                     String?                   @db.VarChar
+  birth_date                    DateTime?                 @db.Date
+  confirmation_token            String?                   @unique(map: "index_users_on_confirmation_token") @db.VarChar
+  confirmed_at                  DateTime?                 @db.Timestamp(6)
+  confirmation_sent_at          DateTime?                 @db.Timestamp(6)
+  unconfirmed_email             String?                   @db.VarChar
+  motivation                    String?                   @db.VarChar
+  admin                         Boolean?                  @default(false)
+  stripe_id                     String?                   @db.VarChar
+  artist_role                   Boolean?                  @default(false)
+  referral_code                 String?                   @db.VarChar
+  referred_by_id                Int?
+  referral_completed_at         DateTime?                 @db.Timestamp(6)
+  default_currency              String?                   @db.VarChar
+  old_wallet                    String[]                  @default([])
+  locale                        String?                   @default("en") @db.VarChar
+  username                      String?                   @db.VarChar
+  slug                          String?                   @unique(map: "index_users_on_slug") @db.VarChar
+  wallet_address                String?                   @db.VarChar
+  connected_wallet_once         Boolean?                  @default(false)
+  received_tokens_from_olds_txs Boolean?                  @default(false)
+  claimed_tokens_from_olds_txs  Boolean?                  @default(false)
+  charges_enabled               Boolean?                  @default(false)
+  can_accept_card_payment       Boolean?                  @default(false)
+  intercom_hash                 String?                   @db.VarChar
+  sign_in_count                 Int                       @default(0)
+  current_sign_in_at            DateTime?                 @db.Timestamp(6)
+  last_sign_in_at               DateTime?                 @db.Timestamp(6)
+  current_sign_in_ip            String?                   @db.VarChar
+  last_sign_in_ip               String?                   @db.VarChar
+  country_code                  String?                   @db.VarChar
+  discord_username              String?                   @db.VarChar
+  admin_permissions             String[]                  @default([]) @db.VarChar
+  provider                      String                    @default("email") @db.VarChar
+  uid                           String                    @default("") @db.VarChar
+  tokens                        Json?                     @db.Json
+  name                          String?                   @db.VarChar
+  allow_password_change         Boolean?                  @default(false)
+  usertextsearchable_index_col  Unsupported("tsvector")?  @default(dbgenerated("to_tsvector('simple'::regconfig, (COALESCE(username, ''::character varying))::text)"))
+  phone_number                  String?                   @db.VarChar
+  finished_stripe_onboarding    Boolean                   @default(false)
+  used_referral_code            Boolean                   @default(false)
+  influencer                    Boolean                   @default(false)
+  deprecated_artist_ids         Int[]                     @default([])
+  connected_on_version_two      Boolean                   @default(true)
+  default_profile_picture_key   String?                   @db.VarChar
+  default_cover_picture_key     String?                   @db.VarChar
+  stripe_customer_id            String?                   @db.VarChar
+  artists                       artists[]
+  bid_offers                    bid_offers[]
+  blockchain_transactions       blockchain_transactions[]
+  currencies                    currencies[]
+  discounts                     discounts[]
+  early_access_list_users       early_access_list_users[]
+  nfts                          nfts[]
+  offchain_transactions         offchain_transactions[]
+  splitter_beneficiaries        splitter_beneficiaries[]
+  squads                        squads[]
+  stage_members                 stage_members[]
+  stripe_payment_methods        stripe_payment_methods[]
+  stripe_transactions           stripe_transactions[]
+  transactions                  transactions[]
+  user_perks                    user_perks[]
+  user_reward_tasks             user_reward_tasks[]
+
+  @@unique([uid, provider], map: "index_users_on_uid_and_provider")
+  @@index([wallet_address], map: "index_users_on_wallet_address")
+  @@index([usertextsearchable_index_col], map: "usertextsearchable_idx", type: Gin)
+  @@index([usertextsearchable_index_col], map: "usertextsearchable_index", type: Gin)
+}
+
+model votes {
+  id                  BigInt   @id @default(autoincrement())
+  user_id             BigInt?
+  requested_artist_id BigInt?
+  created_at          DateTime @db.Timestamp(6)
+  updated_at          DateTime @db.Timestamp(6)
+
+  @@index([requested_artist_id], map: "index_votes_on_requested_artist_id")
+  @@index([user_id], map: "index_votes_on_user_id")
+}
+
+model wallet_details {
+  id          BigInt   @id @default(autoincrement())
+  date        String?  @db.VarChar
+  total_value String?  @db.VarChar
+  details     Json?    @default("{}")
+  user_id     BigInt?
+  created_at  DateTime @db.Timestamp(6)
+  updated_at  DateTime @db.Timestamp(6)
+
+  @@index([user_id], map: "index_wallet_details_on_user_id")
+}
+
+model wallets {
+  id            BigInt          @id @default(autoincrement())
+  address       String?         @db.VarChar
+  artist_id     BigInt
+  created_at    DateTime        @db.Timestamp(6)
+  updated_at    DateTime        @db.Timestamp(6)
+  provider      String?         @db.VarChar
+  artists       artists         @relation(fields: [artist_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_rails_615c7f638b")
+  external_nfts external_nfts[]
+
+  @@index([artist_id], map: "index_wallets_on_artist_id")
+}
+
+model diesel_schema_migrations {
+  version String   @id @db.VarChar(50)
+  run_on  DateTime @default(now()) @db.Timestamp(6)
+
+  @@map("__diesel_schema_migrations")
+}
+
+model posts {
+  id        Int     @id @default(autoincrement())
+  title     String  @db.VarChar
+  body      String
+  published Boolean @default(false)
+}
+
+model stripe_payment_methods {
+  id                BigInt   @id @default(autoincrement())
+  cardholder_name   String?  @db.VarChar
+  brand             String?  @db.VarChar
+  exp_month         Int?
+  exp_year          Int?
+  last4             String?  @db.VarChar
+  payment_method_id String?  @db.VarChar
+  user_id           BigInt
+  created_at        DateTime @db.Timestamp(6)
+  updated_at        DateTime @db.Timestamp(6)
+  users             users    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_rails_7959c87bfe")
+
+  @@index([user_id], map: "index_stripe_payment_methods_on_user_id")
+}
